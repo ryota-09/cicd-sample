@@ -1,0 +1,28 @@
+name: AWS CodeCommit Mirror with GitHub Actions
+on: push
+env:
+  AWS_REGION: ap-northeast-1
+  REPOSITORY_NAME: cicd-sample
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  CodeCommitMirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository (Checkout)
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 #これがないとcheckoutの利用時にエラーが出る。
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.IAM_ROLE_ARN }}
+          role-session-name: FullAccessForGitHubActions
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Push to CodeCommit (Mirroring)
+        run: |
+          git config --global credential.helper '!aws codecommit credential-helper $@'
+          git config --global credential.UseHttpPath true
+          git remote add codecommit https://git-codecommit.${{ env.AWS_REGION }}.amazonaws.com/v1/repos/${{ env.REPOSITORY_NAME }}
+          git push --mirror codecommit
