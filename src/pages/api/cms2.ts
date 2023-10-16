@@ -1,5 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { getHandler1 } from "@/lib/microcms";
+import { getHandler1, getHandler2_blogs, getHandler2_news } from "@/lib/microcms";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -7,8 +7,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // 時間計測の開始（[秒, ナノ秒] のタプルを返します）
   const startTime = process.hrtime();
 
-  // 非同期関数の呼び出し
-  const data = await getHandler1();
+  const [ news, blogs ] = await Promise.all([
+    getHandler2_news(),
+    getHandler2_blogs()
+  ])
+
+  const data = {
+    news: news,
+    blogs: blogs
+  }
 
   // 時間計測の終了と実行時間の計算
   const diffTime = process.hrtime(startTime);
@@ -17,9 +24,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 
   // 実行時間をログに出力
-  console.log(`CMS1_複数の参照フィールドのケース Function execution time: ${executionTime} milliseconds`);
+  console.log(`CMS2_複数のAPIを統合したケース Function execution time: ${executionTime} milliseconds`);
 
-  res.status(200).json({ log: "CMS1_複数の参照フィールドのケース",performanceTime: `${executionTime} ms`, data: data });
+  res.status(200).json({ log: "CMS2_複数のAPIを統合したケース",performanceTime: `${executionTime} ms`, data: data });
 };
 
 export default handler;
