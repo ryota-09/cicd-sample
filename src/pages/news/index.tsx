@@ -14,15 +14,26 @@ type Props = {
 
 const Test: NextPage<Props> = ({ log, data }) => {
   const [selectedValue, setSelectedValue] = useState("");
-  const [displayedNews, setDisplayedNews] = useState(data.blogs.contents)
+  const [displayedNews, setDisplayedNews] = useState(data.blogs.contents);
 
   // セレクトボックスの値が変更された時に呼び出されるハンドラー関数です。
-  const handleChange = (event) => {
+  const handleChange = async (event) => {
+    setDisplayedNews([])
     // セレクトボックスの新しい値を取得します。
     const newValue = event.target.value;
 
+    const content = await fetch(
+      `https://${process.env.NEXT_PUBLIC_DOMAIN_2}.microcms.io/api/v1/blogs?filters=category[contains]${newValue}`,
+      {
+        headers: {
+          "X-MICROCMS-API-KEY": process.env.NEXT_PUBLIC_API_KEY_2 || "",
+        },
+      }
+    ).then(res => res.json()).catch(error => null);
+      console.log(content)
     // 新しい値を状態にセットしてUIを更新します。
-    setSelectedValue(newValue);
+    setDisplayedNews(content.contents);
+    setSelectedValue(newValue)
 
     // ここで他の任意のロジックを実行できます。例えば、API呼び出しをするなど。
     console.log("選択された値:", newValue);
