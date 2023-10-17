@@ -4,6 +4,7 @@ import {
   getHandler2_news,
 } from "@/lib/microcms";
 import { GetServerSideProps, NextPage } from "next";
+import Link from "next/link";
 
 type Props = {
   log: string;
@@ -21,6 +22,9 @@ const Test: NextPage<Props> = ({ log, data }) => {
           <div key={index} className="mt-10 border-2 border-blue-500">
             <p>ID:{item.id}</p>
             <p>title: {item.title}</p>
+            <Link href={`/news/${item.id}`}  className="bg-blue-200">
+              詳細ページボタン
+            </Link>
             <hr></hr>
           </div>
         ))}
