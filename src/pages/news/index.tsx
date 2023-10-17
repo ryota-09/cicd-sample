@@ -5,6 +5,7 @@ import {
 } from "@/lib/microcms";
 import { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
+import { useState } from "react";
 
 type Props = {
   log: string;
@@ -12,17 +13,37 @@ type Props = {
 };
 
 const Test: NextPage<Props> = ({ log, data }) => {
+  const [selectedValue, setSelectedValue] = useState("");
+  const [displayedNews, setDisplayedNews] = useState(data.blogs.contents)
+
+  // セレクトボックスの値が変更された時に呼び出されるハンドラー関数です。
+  const handleChange = (event) => {
+    // セレクトボックスの新しい値を取得します。
+    const newValue = event.target.value;
+
+    // 新しい値を状態にセットしてUIを更新します。
+    setSelectedValue(newValue);
+
+    // ここで他の任意のロジックを実行できます。例えば、API呼び出しをするなど。
+    console.log("選択された値:", newValue);
+  };
   return (
     <div>
       <p>log:</p>
       <p>{log}</p>
       <p>別API News: Title{data.news.title}</p>
+      <select value={selectedValue} onChange={handleChange}>
+        <option value="">選択してください</option>
+        <option value="7lti4xmu8j4w">テクノロジー</option>
+        <option value="9s1s8v1to">更新情報</option>
+        <option value="qhw177d6cs">チュートリアル</option>
+      </select>
       <div className="grid grid-cols-3 gap-3">
-        {data.blogs.contents.map((item, index) => (
+        {displayedNews.map((item, index) => (
           <div key={index} className="mt-10 border-2 border-blue-500">
             <p>ID:{item.id}</p>
             <p>title: {item.title}</p>
-            <Link href={`/news/${item.id}`}  className="bg-blue-200">
+            <Link href={`/news/${item.id}`} className="bg-blue-200">
               詳細ページボタン
             </Link>
             <hr></hr>
