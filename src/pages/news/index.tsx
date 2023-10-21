@@ -66,7 +66,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
       isEmpty || router.query["tags"]?.length === 0 || router.query["tags"]
         ? `tags=${value}`
         : `category=${selectedOption}&tags=${value}`;
-
+    
     router.push({
       pathname: "/news", // 現在のページに留まるか、または別のルートを指定する
       query: searchParams, // クエリパラメータを付与
