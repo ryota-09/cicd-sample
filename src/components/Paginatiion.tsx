@@ -72,7 +72,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages }) => {
         ＞＞
       </button>
       <span className="ml-4">
-        {(currentPage - 1) * 30 + 1}〜{currentPage * 30}件表示
+        {(currentPage - 1) * 2 + 1}〜{currentPage * 2}件表示
       </span>
     </div>
   );

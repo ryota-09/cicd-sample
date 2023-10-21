@@ -34,14 +34,14 @@ const Test: NextPage<Props> = ({ log, data }) => {
   // 状態フックを使ってセレクトボックスの現在の値を保持します。
   const [selectedValue, setSelectedValue] = useState(initTags);
   const [selectedOption, setSelectedOption] = useState(initCategory);
-  
+
   // ラジオボタンの選択が変更されたときのハンドラー関数
   const handleRadioChange = async (event) => {
     const { value } = event.target;
-    setSelectedOption(value)
+    setSelectedOption(value);
 
     let searchParams =
-      isEmpty || router.query["category"]?.length === 0
+      isEmpty || router.query["category"]?.length === 0 || router.query["category"]
         ? `category=${value}`
         : `tags=${selectedValue}&category=${value}`;
 
@@ -60,10 +60,10 @@ const Test: NextPage<Props> = ({ log, data }) => {
       router.query.constructor === Object;
     const { value } = event.target;
 
-    setSelectedValue(value)
-    
+    setSelectedValue(value);
+
     let searchParams =
-      isEmpty || router.query["tags"]?.length === 0
+      isEmpty || router.query["tags"]?.length === 0 || router.query["tags"]
         ? `tags=${value}`
         : `category=${selectedOption}&tags=${value}`;
 
@@ -74,9 +74,8 @@ const Test: NextPage<Props> = ({ log, data }) => {
   };
 
   const currentPage = Number(router.query.page) || 1; // 現在のページ
-  const totalData = 100; // この値はAPIなどから取得することを想定
-  const dataPerPage = 30; // 1ページあたりのデータ数
-  const totalPages = Math.ceil(totalData / dataPerPage); // 総ページ数
+  const dataPerPage = 2; // 1ページあたりのデータ数
+  const totalPages = Math.ceil(data.blogs.totalCount / dataPerPage); // 総ページ数
 
   return (
     <div>
@@ -175,7 +174,7 @@ export default Test;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   context.res.setHeader("Cache-Control", "no-store");
   // リクエストからクエリパラメータを取得
-  const { category, tags } = context.query;
+  const { category, tags, page } = context.query;
 
   // フィルタリング条件を設定
   let filterQuery = "";
@@ -193,13 +192,35 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const [news, blogs] = await Promise.all([
     getHandler2_news(),
-    getHandler2_blogs(filterQuery),
+    getHandler2_blogs(filterQuery, 100),
   ]);
 
   const data = {
     news: news,
     blogs: blogs,
   };
+
+
+  const itemsPerPage = 2; // 1ページあたりのアイテム数
+  let currentPage = page ? +page : 1; // 現在のページ番号、デフォルトは1
+
+  // ページ番号が0以下の場合は、1にリセットします（この行はオプションですが、
+  if (currentPage <= 0) {
+    currentPage = 1;
+  }
+
+  // 現在のページの最初のアイテムのインデックスを計算します。
+  let startIndex = (currentPage - 1) * itemsPerPage;
+
+  // 現在のページの最後のアイテムのインデックスを計算します。ただし、配列の範囲を超えないようにします。
+  let endIndex = Math.min(
+    startIndex + itemsPerPage,
+    data.blogs.contents.length
+  );
+
+  let paginatedItems = data.blogs.contents.slice(startIndex, endIndex);
+
+  data.blogs.contents = paginatedItems;
 
   return {
     props: {
