@@ -1,11 +1,10 @@
 import {
-  getHandler1,
   getHandler2_blogs,
   getHandler2_news,
 } from "@/lib/microcms";
 import { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 
 const mappedOption = {
   option1: "7lti4xmu8j4w",
@@ -19,24 +18,22 @@ type Props = {
 };
 
 const Test: NextPage<Props> = ({ log, data }) => {
-  const [selectedValue, setSelectedValue] = useState("");
+  // 選択されているラジオボタンの値を状態として保持します。
+  const [selectedOption, setSelectedOption] = useState("");
   const [displayedNews, setDisplayedNews] = useState(data.blogs.contents);
 
-  // 各チェックボックスの状態をオブジェクトとして管理します。
-  const [checkboxValues, setCheckboxValues] = useState({
-    option1: false,
-    option2: false,
-    option3: false,
-  });
+  // 状態フックを使ってセレクトボックスの現在の値を保持します。
+  const [selectedValue, setSelectedValue] = useState("");
 
-  // セレクトボックスの値が変更された時に呼び出されるハンドラー関数です。
-  const handleChange = async (event) => {
-    setDisplayedNews([]);
-    // セレクトボックスの新しい値を取得します。
-    const newValue = event.target.value;
+  // ラジオボタンの選択が変更されたときのハンドラー関数
+  const handleRadioChange = async (event) => {
+    const { value } = event.target;
 
-    const content = await fetch(
-      `https://${process.env.NEXT_PUBLIC_DOMAIN_2}.microcms.io/api/v1/blogs?filters=category[contains]${newValue}`,
+    // 新しい値を状態にセットします。
+    setSelectedOption(value);
+
+    const constent = await fetch(
+      `https://${process.env.NEXT_PUBLIC_DOMAIN_2}.microcms.io/api/v1/blogs?filters=category[contains]${selectedOption}`,
       {
         headers: {
           "X-MICROCMS-API-KEY": process.env.NEXT_PUBLIC_API_KEY_2 || "",
@@ -45,77 +42,23 @@ const Test: NextPage<Props> = ({ log, data }) => {
     )
       .then((res) => res.json())
       .catch((error) => null);
-    console.log(content);
+    console.log("@@@@", constent);
+    setDisplayedNews(constent.contents);
+    // ここで他の任意のロジックを実行できます。
+    console.log("選択されたオプション:", value);
+  };
+
+  // セレクトボックスの値が変更された時に呼び出されるハンドラー関数です。
+  const handleChange = (event) => {
+    // セレクトボックスの新しい値を取得します。
+    const newValue = event.target.value;
+
     // 新しい値を状態にセットしてUIを更新します。
-    setDisplayedNews(content.contents);
     setSelectedValue(newValue);
 
     // ここで他の任意のロジックを実行できます。例えば、API呼び出しをするなど。
     console.log("選択された値:", newValue);
   };
-
-  // チェックボックスの状態が変更されたときのハンドラー関数
-  const handleCheckboxChange = (event) => {
-    const { name, checked, value } = event.target;
-    let current = {
-      ...checkboxValues,
-      [name]: checked,
-    };
-    // そのチェックボックスの状態を更新します。
-    setCheckboxValues((prevState) => ({
-      ...prevState,
-      [name]: checked,
-    }));
-
-    // ここで他の任意のロジックを実行できます。
-    console.log(name, "が", checked ? "選択されました" : "選択解除されました");
-  };
-
-  const fetchDataBasedOnFilters = async () => {
-    // チェックされたチェックボックスからクエリパラメータを構築します。
-    const filters = Object.entries(checkboxValues)
-      .filter(([key, value]) => value) // チェックされたものだけを取得
-      .map(([key, value]) => `category[contains]${mappedOption[key]}`) // クエリパラメータを構築
-      .join("[and]"); // "and" 条件で結合
-    console.log(filters);
-    // フィルタ条件がある場合のみAPIを呼び出します。
-    if (filters) {
-      try {
-        const response = await fetch(
-          `https://${process.env.NEXT_PUBLIC_DOMAIN_2}.microcms.io/api/v1/blogs?filters=${filters}`,
-          {
-            headers: {
-              "X-MICROCMS-API-KEY": process.env.NEXT_PUBLIC_API_KEY_2 || "",
-            },
-          }
-        );
-
-        const data = await response.json();
-        console.log(data);
-        setDisplayedNews(data.contents);
-        console.log(data);
-      } catch (error) {
-        console.error(
-          "APIからデータを取得する際にエラーが発生しました:",
-          error
-        );
-        setDisplayedNews(null);
-      }
-    } else {
-      console.log("フィルタ条件が選択されていません。");
-      setDisplayedNews(null);
-    }
-  };
-
-  useEffect(() => {
-    if (
-      checkboxValues.option1 ||
-      checkboxValues.option2 ||
-      checkboxValues.option3
-    ) {
-      fetchDataBasedOnFilters();
-    }
-  }, [checkboxValues]);
 
   return (
     <div>
@@ -131,40 +74,42 @@ const Test: NextPage<Props> = ({ log, data }) => {
         </select>
         <hr />
         <div>
-          <label>
-            <input
-              type="checkbox"
-              name="option1"
-              value="7lti4xmu8j4w"
-              checked={checkboxValues.option1}
-              onChange={handleCheckboxChange}
-            />
-            テクノロジー
-          </label>
-        </div>
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              name="option2"
-              checked={checkboxValues.option2}
-              onChange={handleCheckboxChange}
-              value="9s1s8v1to"
-            />
-            更新情報
-          </label>
-        </div>
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              name="option3"
-              checked={checkboxValues.option3}
-              onChange={handleCheckboxChange}
-              value="qhw177d6cs"
-            />
-            チュートリアル
-          </label>
+          <div>
+            <label>
+              <input
+                type="radio"
+                name="options"
+                value="qhw177d6cs"
+                checked={selectedOption === "qhw177d6cs"}
+                onChange={handleRadioChange}
+              />
+              チュートリアル
+            </label>
+          </div>
+          <div>
+            <label>
+              <input
+                type="radio"
+                name="options"
+                value="7lti4xmu8j4w"
+                checked={selectedOption === "7lti4xmu8j4w"}
+                onChange={handleRadioChange}
+              />
+              テクノロジー
+            </label>
+          </div>
+          <div>
+            <label>
+              <input
+                type="radio"
+                name="options"
+                value="9s1s8v1to"
+                checked={selectedOption === "9s1s8v1to"}
+                onChange={handleRadioChange}
+              />
+              更新情報
+            </label>
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
@@ -176,7 +121,9 @@ const Test: NextPage<Props> = ({ log, data }) => {
             <p>カテゴリ: </p>
             <div className="my-2">
               {item.category.map((itemEl, index2) => (
-                <p key={index2} className="bg-blue-100">{itemEl.name}</p>
+                <p key={index2} className="bg-blue-100">
+                  {itemEl.name}
+                </p>
               ))}
             </div>
             <Link href={`/news/${item.id}`} className="bg-blue-200">
