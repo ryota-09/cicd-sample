@@ -41,7 +41,9 @@ const Test: NextPage<Props> = ({ log, data }) => {
     setSelectedOption(value);
 
     let searchParams =
-      isEmpty || router.query["category"]?.length === 0 || router.query["category"]
+      isEmpty ||
+      router.query["category"]?.length === 0 ||
+      (router.query["category"] && !router.query["tags"])
         ? `category=${value}`
         : `tags=${selectedValue}&category=${value}`;
 
@@ -63,10 +65,12 @@ const Test: NextPage<Props> = ({ log, data }) => {
     setSelectedValue(value);
 
     let searchParams =
-      isEmpty || router.query["tags"]?.length === 0 || router.query["tags"]
+      isEmpty ||
+      router.query["tags"]?.length === 0 ||
+      (router.query["tags"] && !router.query["category"])
         ? `tags=${value}`
         : `category=${selectedOption}&tags=${value}`;
-    
+
     router.push({
       pathname: "/news", // 現在のページに留まるか、または別のルートを指定する
       query: searchParams, // クエリパラメータを付与
@@ -199,7 +203,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     news: news,
     blogs: blogs,
   };
-
 
   const itemsPerPage = 2; // 1ページあたりのアイテム数
   let currentPage = page ? +page : 1; // 現在のページ番号、デフォルトは1
