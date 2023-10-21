@@ -18,38 +18,57 @@ type Props = {
 const Test: NextPage<Props> = ({ log, data }) => {
   const router = useRouter(); // Next.jsのルーターフックを使用
 
-  // 状態フックを使ってセレクトボックスの現在の値を保持します。
-  const [selectedValue, setSelectedValue] = useState("");
+  const isEmpty =
+    Object.keys(router.query).length === 0 &&
+    router.query.constructor === Object;
 
+  const initCategory =
+    isEmpty && router.query["category"]?.length === 0
+      ? ""
+      : router.query["category"];
+
+  const initTags =
+    isEmpty && router.query["tags"]?.length === 0 ? "" : router.query["tags"];
+
+  // 状態フックを使ってセレクトボックスの現在の値を保持します。
+  const [selectedValue, setSelectedValue] = useState(initTags);
+  const [selectedOption, setSelectedOption] = useState(initCategory);
+  
   // ラジオボタンの選択が変更されたときのハンドラー関数
   const handleRadioChange = async (event) => {
-    const isEmpty =
-      Object.keys(router.query).length === 0 &&
-      router.query.constructor === Object;
-    const { value } = event.target.value;
-    console.log(router.query);
+    const { value } = event.target;
+    setSelectedOption(value)
+
+    let searchParams =
+      isEmpty || router.query["category"]?.length === 0
+        ? `?category=${value}`
+        : `?tags=${selectedValue}&category=${value}`;
+
     // 選択されたオプションを使ってURLを構築し、そのURLに遷移する
     router.push({
-      pathname: `/news${
-        isEmpty && router.query["category"]?.length === 0
-          ? ""
-          : `?tags=${router.query["tags"]}`
-      }`, // 現在のページに留まるか、または別のルートを指定する
-      search:
-        isEmpty && router.query["category"]?.length === 0
-          ? `?category=${value}`
-          : `&category=${value}`, // クエリパラメータを付与
+      pathname: `/news`, // 現在のページに留まるか、または別のルートを指定する
+      search: searchParams,
+      // クエリパラメータを付与
     });
   };
 
   // セレクトボックスの値が変更された時に呼び出されるハンドラー関数です。
   const handleChange = (event) => {
-    // セレクトボックスの新しい値を取得します。
-    const newValue = event.target.value;
+    const isEmpty =
+      Object.keys(router.query).length === 0 &&
+      router.query.constructor === Object;
+    const { value } = event.target;
+    
+    setSelectedValue(value)
+    
+    let searchParams =
+      isEmpty || router.query["tags"]?.length === 0
+        ? `?tags=${value}`
+        : `?category=${selectedOption}&tags=${value}`;
 
     router.push({
       pathname: "/news", // 現在のページに留まるか、または別のルートを指定する
-      search: `?tags=${newValue}`, // クエリパラメータを付与
+      search: searchParams, // クエリパラメータを付与
     });
   };
 
@@ -75,7 +94,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
                 type="radio"
                 name="options"
                 value="info"
-                // checked={selectedOption === "info"}
+                checked={selectedOption === "info"}
                 onChange={handleRadioChange}
               />
               お知らせ
@@ -87,7 +106,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
                 type="radio"
                 name="options"
                 value="about"
-                // checked={selectedOption === "about"}
+                checked={selectedOption === "about"}
                 onChange={handleRadioChange}
               />
               詳細について
@@ -99,7 +118,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
                 type="radio"
                 name="options"
                 value="contact"
-                // checked={selectedOption === "contact"}
+                checked={selectedOption === "contact"}
                 onChange={handleRadioChange}
               />
               問い合わせ
@@ -111,7 +130,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
                 type="radio"
                 name="options"
                 value="other"
-                // checked={selectedOption === "other"}
+                checked={selectedOption === "other"}
                 onChange={handleRadioChange}
               />
               その他
@@ -150,16 +169,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   context.res.setHeader("Cache-Control", "no-store");
   // リクエストからクエリパラメータを取得
   const { category, tags } = context.query;
-  console.log(tags);
 
   // フィルタリング条件を設定
   let filterQuery = "";
-  if (category) {
+  if (category && tags) {
+    filterQuery = `category[contains]${category}[and]tags[contains]${tags}`;
+  } else if (category) {
     // ここでMicroCMSのフィルタリング機能を使用してクエリを構築します。
     // 例えば、'option'フィールドが特定の値と一致するコンテンツをフィルタリングする場合：
     filterQuery = `category[contains]${category}`;
-  }
-  if (tags) {
+  } else if (tags) {
     // ここでMicroCMSのフィルタリング機能を使用してクエリを構築します。
     // 例えば、'option'フィールドが特定の値と一致するコンテンツをフィルタリングする場合：
     filterQuery = `tags[contains]${tags}`;
