@@ -27,9 +27,12 @@ export const getHandler2_news = async () => {
   return data
 }
 
-export const getHandler2_blogs = async () => {
+export const getHandler2_blogs = async (filters: string) => {
   const data = await client_2.get({
-    endpoint: "blogs"
+    endpoint: "blogs",
+    queries: {
+      filters: filters
+    }
   })
   return data
 }

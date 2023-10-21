@@ -4,6 +4,7 @@ import {
 } from "@/lib/microcms";
 import { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import {  useState } from "react";
 
 const mappedOption = {
@@ -18,9 +19,7 @@ type Props = {
 };
 
 const Test: NextPage<Props> = ({ log, data }) => {
-  // 選択されているラジオボタンの値を状態として保持します。
-  const [selectedOption, setSelectedOption] = useState("");
-  const [displayedNews, setDisplayedNews] = useState(data.blogs.contents);
+  const router = useRouter(); // Next.jsのルーターフックを使用
 
   // 状態フックを使ってセレクトボックスの現在の値を保持します。
   const [selectedValue, setSelectedValue] = useState("");
@@ -29,23 +28,11 @@ const Test: NextPage<Props> = ({ log, data }) => {
   const handleRadioChange = async (event) => {
     const { value } = event.target;
 
-    // 新しい値を状態にセットします。
-    setSelectedOption(value);
-
-    const constent = await fetch(
-      `https://${process.env.NEXT_PUBLIC_DOMAIN_2}.microcms.io/api/v1/blogs?filters=category[contains]${selectedOption}`,
-      {
-        headers: {
-          "X-MICROCMS-API-KEY": process.env.NEXT_PUBLIC_API_KEY_2 || "",
-        },
-      }
-    )
-      .then((res) => res.json())
-      .catch((error) => null);
-    console.log("@@@@", constent);
-    setDisplayedNews(constent.contents);
-    // ここで他の任意のロジックを実行できます。
-    console.log("選択されたオプション:", value);
+    // 選択されたオプションを使ってURLを構築し、そのURLに遷移する
+    router.push({
+      pathname: '/news',  // 現在のページに留まるか、または別のルートを指定する
+      search: `?category=${value}`, // クエリパラメータを付与
+    });
   };
 
   // セレクトボックスの値が変更された時に呼び出されるハンドラー関数です。
@@ -68,9 +55,11 @@ const Test: NextPage<Props> = ({ log, data }) => {
       <div className="flex gap-5 justify-center">
         <select value={selectedValue} onChange={handleChange}>
           <option value="">選択してください</option>
-          <option value="7lti4xmu8j4w">テクノロジー</option>
-          <option value="9s1s8v1to">更新情報</option>
-          <option value="qhw177d6cs">チュートリアル</option>
+          <option value="apple">apple</option>
+          <option value="orange">orange</option>
+          <option value="lemon">lemon</option>
+          <option value="banana">banana</option>
+          <option value="other">other</option>
         </select>
         <hr />
         <div>
@@ -79,11 +68,11 @@ const Test: NextPage<Props> = ({ log, data }) => {
               <input
                 type="radio"
                 name="options"
-                value="qhw177d6cs"
-                checked={selectedOption === "qhw177d6cs"}
+                value="info"
+                // checked={selectedOption === "info"}
                 onChange={handleRadioChange}
               />
-              チュートリアル
+              お知らせ
             </label>
           </div>
           <div>
@@ -91,11 +80,11 @@ const Test: NextPage<Props> = ({ log, data }) => {
               <input
                 type="radio"
                 name="options"
-                value="7lti4xmu8j4w"
-                checked={selectedOption === "7lti4xmu8j4w"}
+                value="about"
+                // checked={selectedOption === "about"}
                 onChange={handleRadioChange}
               />
-              テクノロジー
+              詳細について
             </label>
           </div>
           <div>
@@ -103,17 +92,29 @@ const Test: NextPage<Props> = ({ log, data }) => {
               <input
                 type="radio"
                 name="options"
-                value="9s1s8v1to"
-                checked={selectedOption === "9s1s8v1to"}
+                value="contact"
+                // checked={selectedOption === "contact"}
                 onChange={handleRadioChange}
               />
-              更新情報
+              問い合わせ
+            </label>
+          </div>
+          <div>
+            <label>
+              <input
+                type="radio"
+                name="options"
+                value="other"
+                // checked={selectedOption === "other"}
+                onChange={handleRadioChange}
+              />
+              その他
             </label>
           </div>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
-        {displayedNews.map((item, index) => (
+        {data.blogs.contents.map((item, index) => (
           <div key={index} className="mt-10 border-2 border-blue-500">
             <p>ID:{item.id}</p>
             <p>title: {item.title}</p>
@@ -122,7 +123,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
             <div className="my-2">
               {item.category.map((itemEl, index2) => (
                 <p key={index2} className="bg-blue-100">
-                  {itemEl.name}
+                  {itemEl}
                 </p>
               ))}
             </div>
@@ -139,11 +140,21 @@ export default Test;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   context.res.setHeader("Cache-Control", "no-store");
-  // 時間計測の開始（[秒, ナノ秒] のタプルを返します）
+  // リクエストからクエリパラメータを取得
+  const { category } = context.query;
+  console.log(category)
+
+   // フィルタリング条件を設定
+   let filterQuery = '';
+   if (category) {
+     // ここでMicroCMSのフィルタリング機能を使用してクエリを構築します。
+     // 例えば、'option'フィールドが特定の値と一致するコンテンツをフィルタリングする場合：
+     filterQuery = `category[contains]${category}`;
+   }
 
   const [news, blogs] = await Promise.all([
     getHandler2_news(),
-    getHandler2_blogs(),
+    getHandler2_blogs(filterQuery),
   ]);
 
   const data = {
