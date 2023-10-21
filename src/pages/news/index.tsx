@@ -1,11 +1,8 @@
-import {
-  getHandler2_blogs,
-  getHandler2_news,
-} from "@/lib/microcms";
+import { getHandler2_blogs, getHandler2_news } from "@/lib/microcms";
 import { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import {  useState } from "react";
+import { useState } from "react";
 
 const mappedOption = {
   option1: "7lti4xmu8j4w",
@@ -26,12 +23,22 @@ const Test: NextPage<Props> = ({ log, data }) => {
 
   // ラジオボタンの選択が変更されたときのハンドラー関数
   const handleRadioChange = async (event) => {
-    const { value } = event.target;
-
+    const isEmpty =
+      Object.keys(router.query).length === 0 &&
+      router.query.constructor === Object;
+    const { value } = event.target.value;
+    console.log(router.query);
     // 選択されたオプションを使ってURLを構築し、そのURLに遷移する
     router.push({
-      pathname: '/news',  // 現在のページに留まるか、または別のルートを指定する
-      search: `?category=${value}`, // クエリパラメータを付与
+      pathname: `/news${
+        isEmpty && router.query["category"]?.length === 0
+          ? ""
+          : `?tags=${router.query["tags"]}`
+      }`, // 現在のページに留まるか、または別のルートを指定する
+      search:
+        isEmpty && router.query["category"]?.length === 0
+          ? `?category=${value}`
+          : `&category=${value}`, // クエリパラメータを付与
     });
   };
 
@@ -40,11 +47,10 @@ const Test: NextPage<Props> = ({ log, data }) => {
     // セレクトボックスの新しい値を取得します。
     const newValue = event.target.value;
 
-    // 新しい値を状態にセットしてUIを更新します。
-    setSelectedValue(newValue);
-
-    // ここで他の任意のロジックを実行できます。例えば、API呼び出しをするなど。
-    console.log("選択された値:", newValue);
+    router.push({
+      pathname: "/news", // 現在のページに留まるか、または別のルートを指定する
+      search: `?tags=${newValue}`, // クエリパラメータを付与
+    });
   };
 
   return (
@@ -120,11 +126,13 @@ const Test: NextPage<Props> = ({ log, data }) => {
             <p>title: {item.title}</p>
             <br />
             <p>カテゴリ: </p>
+            <p className="bg-blue-50">{item.category}</p>
+            <p>tags: </p>
             <div className="my-2">
-              {item.category.map((itemEl, index2) => (
-                <p key={index2} className="bg-blue-100">
-                  {itemEl}
-                </p>
+              {item.tags.map((itemEl, index2) => (
+                <span key={index2} className="bg-blue-100">
+                  {itemEl},
+                </span>
               ))}
             </div>
             <Link href={`/news/${item.id}`} className="bg-blue-200">
@@ -141,16 +149,21 @@ export default Test;
 export const getServerSideProps: GetServerSideProps = async (context) => {
   context.res.setHeader("Cache-Control", "no-store");
   // リクエストからクエリパラメータを取得
-  const { category } = context.query;
-  console.log(category)
+  const { category, tags } = context.query;
+  console.log(tags);
 
-   // フィルタリング条件を設定
-   let filterQuery = '';
-   if (category) {
-     // ここでMicroCMSのフィルタリング機能を使用してクエリを構築します。
-     // 例えば、'option'フィールドが特定の値と一致するコンテンツをフィルタリングする場合：
-     filterQuery = `category[contains]${category}`;
-   }
+  // フィルタリング条件を設定
+  let filterQuery = "";
+  if (category) {
+    // ここでMicroCMSのフィルタリング機能を使用してクエリを構築します。
+    // 例えば、'option'フィールドが特定の値と一致するコンテンツをフィルタリングする場合：
+    filterQuery = `category[contains]${category}`;
+  }
+  if (tags) {
+    // ここでMicroCMSのフィルタリング機能を使用してクエリを構築します。
+    // 例えば、'option'フィールドが特定の値と一致するコンテンツをフィルタリングする場合：
+    filterQuery = `tags[contains]${tags}`;
+  }
 
   const [news, blogs] = await Promise.all([
     getHandler2_news(),
