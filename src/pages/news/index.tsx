@@ -1,3 +1,4 @@
+import Pagination from "@/components/Paginatiion";
 import { getHandler2_blogs, getHandler2_news } from "@/lib/microcms";
 import { GetServerSideProps, NextPage } from "next";
 import Link from "next/link";
@@ -41,13 +42,13 @@ const Test: NextPage<Props> = ({ log, data }) => {
 
     let searchParams =
       isEmpty || router.query["category"]?.length === 0
-        ? `?category=${value}`
-        : `?tags=${selectedValue}&category=${value}`;
+        ? `category=${value}`
+        : `tags=${selectedValue}&category=${value}`;
 
     // 選択されたオプションを使ってURLを構築し、そのURLに遷移する
     router.push({
       pathname: `/news`, // 現在のページに留まるか、または別のルートを指定する
-      search: searchParams,
+      query: searchParams,
       // クエリパラメータを付与
     });
   };
@@ -58,25 +59,31 @@ const Test: NextPage<Props> = ({ log, data }) => {
       Object.keys(router.query).length === 0 &&
       router.query.constructor === Object;
     const { value } = event.target;
-    
+
     setSelectedValue(value)
     
     let searchParams =
       isEmpty || router.query["tags"]?.length === 0
-        ? `?tags=${value}`
-        : `?category=${selectedOption}&tags=${value}`;
+        ? `tags=${value}`
+        : `category=${selectedOption}&tags=${value}`;
 
     router.push({
       pathname: "/news", // 現在のページに留まるか、または別のルートを指定する
-      search: searchParams, // クエリパラメータを付与
+      query: searchParams, // クエリパラメータを付与
     });
   };
+
+  const currentPage = Number(router.query.page) || 1; // 現在のページ
+  const totalData = 100; // この値はAPIなどから取得することを想定
+  const dataPerPage = 30; // 1ページあたりのデータ数
+  const totalPages = Math.ceil(totalData / dataPerPage); // 総ページ数
 
   return (
     <div>
       <p>log:</p>
       <p>{log}</p>
       <p>別API News: Title{data.news.title}</p>
+      <Pagination currentPage={currentPage} totalPages={totalPages} />
       <div className="flex gap-5 justify-center">
         <select value={selectedValue} onChange={handleChange}>
           <option value="">選択してください</option>
