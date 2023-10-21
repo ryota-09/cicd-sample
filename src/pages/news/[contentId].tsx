@@ -17,18 +17,34 @@ type Props = {
 const Test: NextPage<Props> = ({ log, content, data }) => {
   return (
     <div>
-      <p>詳細ページ</p>
+      <p className="mb-10">詳細ページ</p>
       <Link className="p-10 bg-red-300" href={`/news/`}>
         一覧に戻る
       </Link>
+      <p className="mt-10">ID: </p>
+      <p>{content.id}</p>
       <p className="mt-12">{content.title}</p>
       <p className="mt-12">publishedAt : </p>
       <p>{content.publishedAt}</p>
-      <div>
+      <div className="mt-12">
         前後の記事
         <div>
-          <p className="text-blue-500">前の記事: {data.prev.contents[0].title} ({data.prev.contents[0].publishedAt})</p>
-          <p className="text-red-500">後の記事: {data.next.contents[0].title} ({data.next.contents[0].publishedAt})</p>
+          {data.prev.contents.length !== 0 && (
+            <Link href={`/news/${data.prev.contents[0].id}`}>
+              <p className="text-blue-500">
+                前の記事: {data.prev.contents[0].title} (
+                {data.prev.contents[0].publishedAt})
+              </p>
+            </Link>
+          )}
+          {data.next.contents.length !== 0 && (
+            <Link href={`/news/${data.next.contents[0].id ?? ""}`}>
+              <p className="text-red-500">
+                後の記事: {data.next.contents[0].title} (
+                {data.next.contents[0].publishedAt})
+              </p>
+            </Link>
+          )}
         </div>
       </div>
     </div>
