@@ -1,4 +1,4 @@
-import { getHandler1, getHandler2_blogs, getHandler2_news } from "@/lib/microcms";
+import { getHandler2_blogs, getHandler2_news } from "@/lib/microcms";
 import { GetServerSideProps, NextPage } from "next";
 
 type Props = {
