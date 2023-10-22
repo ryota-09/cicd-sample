@@ -9,7 +9,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const [ news, blogs ] = await Promise.all([
     getHandler2_news(),
-    getHandler2_blogs()
+    getHandler2_blogs("", 100)
   ])
 
   const data = {
