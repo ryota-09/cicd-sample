@@ -36,7 +36,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
   const [selectedOption, setSelectedOption] = useState(initCategory);
 
   // ラジオボタンの選択が変更されたときのハンドラー関数
-  const handleRadioChange = async (event) => {
+  const handleRadioChange = async (event: any) => {
     const { value } = event.target;
     setSelectedOption(value);
 
@@ -56,7 +56,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
   };
 
   // セレクトボックスの値が変更された時に呼び出されるハンドラー関数です。
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     const isEmpty =
       Object.keys(router.query).length === 0 &&
       router.query.constructor === Object;
@@ -149,7 +149,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
-        {data.blogs.contents.map((item, index) => (
+        {data.blogs.contents.map((item: any, index: any) => (
           <div key={index} className="mt-10 border-2 border-blue-500">
             <p>ID:{item.id}</p>
             <p>title: {item.title}</p>
@@ -158,7 +158,7 @@ const Test: NextPage<Props> = ({ log, data }) => {
             <p className="bg-blue-50">{item.category}</p>
             <p>tags: </p>
             <div className="my-2">
-              {item.tags.map((itemEl, index2) => (
+              {item.tags.map((itemEl: any, index2: any) => (
                 <span key={index2} className="bg-blue-100">
                   {itemEl},
                 </span>
