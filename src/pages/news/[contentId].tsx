@@ -54,10 +54,11 @@ export default Test;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   context.res.setHeader("Cache-Control", "no-store");
+  if(!context.params) return { notFound: true }
   // 時間計測の開始（[秒, ナノ秒] のタプルを返します）
-  const { contentId } = context.params;
+  const contentId = context.params.contentId
 
-  const content = await getHandler2_current_blog(contentId);
+  const content = await getHandler2_current_blog(contentId as string);
 
   const data = await getHandler2_prev_and_next(content.publishedAt);
   console.log(data);
