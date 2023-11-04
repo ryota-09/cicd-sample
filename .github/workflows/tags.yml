@@ -20,14 +20,12 @@ jobs:
         run: |
           echo "コール"
           # タグが存在するか確認
-          if ! git rev-list --tags --max-count=1 2>/dev/null; then
-            # タグが存在しない場合
-            echo "タグなし"
-            LATEST_TAG=""
-          else
-            # 最新のタグを取得
-            echo "タグあり"
-            LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+          if ! git rev-list --tags --max-count=1 &>/dev/null; then
+            # タグが存在しない場合、初期リリースとしてv1.0.0.0をセット
+            NEW_TAG="v1.0.0.0"
+            echo "Initial release: $NEW_TAG"
+            echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+            exit 0
           fi
 
           # 最新のタグを取得
