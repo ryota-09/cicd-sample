@@ -24,9 +24,9 @@ jobs:
       - name: リリースタグを設定
         id: set_release_tag
         run: |
-          echo "${{ steps.cur_tag_var.outputs.cur_tags }}"
+          echo "${{ steps.cur_tag_var.outputs.cur_tag }}"
           # タグが存在しない場合、初期リリースとしてv1.0.0.0をセット
-          if [[ "${{ steps.cur_tag_var.outputs.cur_tags }}" == '' ]]; then
+          if [[ "${{ steps.cur_tag_var.outputs.cur_tag }}" == '' ]]; then
             NEW_TAG="v1.0.0.0"
             echo "Initial release: $NEW_TAG"
             echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
