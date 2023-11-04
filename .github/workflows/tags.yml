@@ -12,13 +12,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
       - name: 現在の最新タグを取得
         id: cur_tag_var
         run: |
-          git fetch --prune --unshallow
+          # Check if the repository is shallow and unshallow it if true
+          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
+            git fetch --prune --unshallow
+          fi
+
           echo "$(git tag --sort=creatordate | tail -n 1)" > CUR_TAG
-          echo ::set-output name=cur_tag::$(cat CUR_TAG)
+          echo "cur_tag=$(cat CUR_TAG)" >> $GITHUB_ENV
 
       - name: Generate new tag
         id: new_tag
