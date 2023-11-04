@@ -61,7 +61,7 @@ jobs:
           # 新しいタグを生成
           NEW_TAG="v$MAJOR.$MINOR.$PATCH1.$PATCH2"
           echo "New tag: $NEW_TAG"
-          echo ::set-output name=new_tag::$(cat NEW_TAg)
+          echo ::set-output name=new_tag::$(cat NEW_TAG)
 
       - name: リリースタグをgitにpush
         id: set_git_tag
