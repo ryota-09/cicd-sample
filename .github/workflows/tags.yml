@@ -69,3 +69,8 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.FOR_TAG_GITHUB_TOKEN }}@github.com/ryota-09/cicd-sample.git
+
+          echo "${{ steps.set_release_tag.outputs.new_tag }}" > TARGET_TAG_NAME
+          cat TARGET_TAG_NAME
+          git tag $(cat TARGET_TAG_NAME)
+          git push origin $(cat TARGET_TAG_NAME)
