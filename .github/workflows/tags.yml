@@ -18,6 +18,7 @@ jobs:
       - name: Generate new tag
         id: new_tag
         run: |
+          echo "コール"
           # 最新のタグを取得
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
 
