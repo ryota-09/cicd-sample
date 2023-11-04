@@ -63,6 +63,12 @@ jobs:
           echo "New tag: $NEW_TAG"
           echo ::set-output name=new_tag::$NEW_TAG
 
+      - name: Set up Git credentials
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/ryota-09/cicd-sample.git
+
       - name: リリースタグをgitにpush
         id: set_git_tag
         run: |
