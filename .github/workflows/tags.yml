@@ -20,3 +20,8 @@ jobs:
           git fetch --prune --unshallow
           echo "$(git tag --sort=creatordate | tail -n 1)" > CUR_TAG
           echo ::set-output name=cur_tag::$(cat CUR_TAG)
+
+      - name: リリースタグを設定
+        id: set_release_tag
+        run: |
+          echo "${{ steps.cur_tag_var.outputs.cur_tag }}"
