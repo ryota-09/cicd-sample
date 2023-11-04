@@ -70,7 +70,7 @@ jobs:
           BODY="${CURRENT_DATE}公開"
           echo ::set-output name=body::$BODY
 
-      - name: タグの設定
+      - name: リリースノートを含めたタグの設定
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.set_release_tag.outputs.new_tag }}
