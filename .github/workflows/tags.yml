@@ -33,6 +33,7 @@ jobs:
             exit 0
           fi
 
+          NEW_TAG="${{ steps.cur_tag_var.outputs.cur_tag }}"
           # タグからバージョン部分を取得して分割
           IFS='.' read -ra VERSION <<< "${NEW_TAG#v}"
 
