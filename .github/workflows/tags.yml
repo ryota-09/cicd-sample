@@ -12,8 +12,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 #これがないとcheckoutの利用時にエラーが出る。
+        
       - name: 現在の最新タグを取得
         id: cur_tag_var
         run: |
