@@ -63,7 +63,7 @@ jobs:
           echo "New tag: $NEW_TAG"
           echo ::set-output name=new_tag::$NEW_TAG
 
-      - name: Set up Git credentials
+      - name: 権限を付与
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
