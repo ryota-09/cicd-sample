@@ -61,12 +61,14 @@ jobs:
           NEW_TAG="v$MAJOR.$MINOR.$PATCH1.$PATCH2"
           echo "New tag: $NEW_TAG"
           echo ::set-output name=new_tag::$NEW_TAG
-          
+
       - name: 権限を付与とタグの設定
         run: |
           TARGET_TAG_NAME="${{ steps.set_release_tag.outputs.new_tag }}"
+          CURRENT_DATE=$(TZ="Asia/Tokyo" date +"%Y年%m月%d日")
           echo TARGET_TAG_NAME
-          git tag $TARGET_TAG_NAME
+          echo $DESCRIPTION
+          git tag $TARGET_TAG_NAME -m "$DESCRIPTION"
           git push origin $TARGET_TAG_NAME
 
       # - name: タグの設定
