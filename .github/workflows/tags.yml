@@ -11,9 +11,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0 #これがないとcheckoutの利用時にエラーが出る。
+      - name: 現在の最新タグを取得
+        id: cur_tag_var
+        run: |
+          git fetch --prune --unshallow
+          echo "$(git tag --sort=creatordate | tail -n 1)" > CUR_TAG
+          echo ::set-output name=cur_tag::$(cat CUR_TAG)
 
       - name: Generate new tag
         id: new_tag
