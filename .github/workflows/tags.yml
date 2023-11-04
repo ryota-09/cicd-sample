@@ -61,6 +61,11 @@ jobs:
           NEW_TAG="v$MAJOR.$MINOR.$PATCH1.$PATCH2"
           echo "New tag: $NEW_TAG"
           echo ::set-output name=new_tag::$NEW_TAG
+          
+      - name: Set Git Committer Info
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
 
       - name: 権限を付与とタグの設定
         run: |
