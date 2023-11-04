@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: 現在の最新タグを取得
+      - name: 現在の最新タグを取得し、値を設定
         id: cur_tag_var
         run: |
           git fetch --prune --unshallow
