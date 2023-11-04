@@ -68,7 +68,7 @@ jobs:
           # タイムゾーンをJSTに設定して、現在の日付を取得
           CURRENT_DATE=$(TZ="Asia/Tokyo" date +"%Y年%m月%d日")
           DESCRIPTION="${CURRENT_DATE}公開"
-          echo DESCRIPTION
+          echo $DESCRIPTION
           # タグを作成してディスクリプションを付与
-          git tag -a $TARGET_TAG_NAME main -m "$DESCRIPTION"
+          git tag -a $TARGET_TAG_NAME -m "$DESCRIPTION"
           git push origin $TARGET_TAG_NAME
