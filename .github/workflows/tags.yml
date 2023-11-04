@@ -19,7 +19,7 @@ jobs:
         run: |
           git fetch --prune --unshallow
           echo "$(git tag --sort=creatordate | tail -n 1)" > CUR_TAG
-          echo ::set-output name=cur_tag::$CUR_TAG
+          echo ::set-output name=cur_tag::$(cat CUR_TAG)
 
       - name: リリースタグを設定
         id: set_release_tag
