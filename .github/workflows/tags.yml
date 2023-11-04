@@ -6,38 +6,17 @@ on:
       - main
 
 jobs:
-  create-tag:
+  release:
+    name: release
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: 現在の最新タグを取得
         id: cur_tag_var
         run: |
-          # Check if the repository is shallow and unshallow it if true
-          if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then
-            git fetch --prune --unshallow
-          fi
-
+          git fetch --prune --unshallow
           echo "$(git tag --sort=creatordate | tail -n 1)" > CUR_TAG
-          echo "cur_tag=$(cat CUR_TAG)" >> $GITHUB_ENV
-
-      - name: Generate new tag
-        id: new_tag
-        run: |
-          echo "コール"
-          # タグが存在するか確認
-          if ! git rev-list --tags --max-count=1 &>/dev/null; then
-            # タグが存在しない場合、初期リリースとしてv1.0.0.0をセット
-            NEW_TAG="v1.0.0.0"
-            echo "Initial release: $NEW_TAG"
-            echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-            exit 0
-          fi
-
-          # 最新のタグを取得
-          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
-
-          echo "Latest tag: $LATEST_TAG"
+          echo ::set-output name=cur_tag::$(cat CUR_TAG)
