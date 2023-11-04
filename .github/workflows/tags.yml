@@ -66,6 +66,6 @@ jobs:
       - name: 権限を付与とタグの設定
         run: |
           TARGET_TAG_NAME="${{ steps.set_release_tag.outputs.new_tag }}"
-          echo "${{ steps.set_release_tag.outputs.new_tag }}"
+          echo TARGET_TAG_NAME
           git tag $TARGET_TAG_NAME
           git push origin $TARGET_TAG_NAME
