@@ -19,6 +19,15 @@ jobs:
         id: new_tag
         run: |
           echo "コール"
+          # タグが存在するか確認
+          if ! git rev-list --tags --max-count=1 2>/dev/null; then
+            # タグが存在しない場合
+            LATEST_TAG=""
+          else
+            # 最新のタグを取得
+            LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+          fi
+          
           # 最新のタグを取得
           LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
 
