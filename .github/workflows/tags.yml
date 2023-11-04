@@ -34,3 +34,31 @@ jobs:
           fi
 
           echo "コール"
+          # タグからバージョン部分を取得して分割
+          IFS='.' read -ra VERSION <<< "${LATEST_TAG#v}"
+
+          # バージョンを数値として取得
+          MAJOR="${VERSION[0]}"
+          MINOR="${VERSION[1]}"
+          PATCH1="${VERSION[2]}"
+          PATCH2="${VERSION[3]}"
+
+          # パッチバージョンをインクリメント
+          PATCH2=$((PATCH2 + 1))
+          # 繰り上がりの処理
+          if (( PATCH2 > 9 )); then
+            PATCH2=0
+            PATCH1=$((PATCH1 + 1))
+            if (( PATCH1 > 9 )); then
+              PATCH1=0
+              MINOR=$((MINOR + 1))
+              if (( MINOR > 9 )); then
+                MINOR=0
+                MAJOR=$((MAJOR + 1))
+              fi
+            fi
+          fi
+          # 新しいタグを生成
+          NEW_TAG="v$MAJOR.$MINOR.$PATCH1.$PATCH2"
+          echo "New tag: $NEW_TAG"
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENVs
