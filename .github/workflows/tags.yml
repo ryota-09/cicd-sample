@@ -35,7 +35,7 @@ jobs:
 
           echo "コール"
           # タグからバージョン部分を取得して分割
-          IFS='.' read -ra VERSION <<< "v1.0.0.0"
+          IFS='.' read -ra VERSION <<< "v1.0.0.0"#v
 
           # バージョンを数値として取得
           MAJOR="${VERSION[0]}"
@@ -61,4 +61,4 @@ jobs:
           # 新しいタグを生成
           NEW_TAG="v$MAJOR.$MINOR.$PATCH1.$PATCH2"
           echo "New tag: $NEW_TAG"
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENVs
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
