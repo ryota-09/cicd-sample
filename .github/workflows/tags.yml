@@ -35,7 +35,7 @@ jobs:
 
           echo "コール"
           # タグからバージョン部分を取得して分割
-          IFS='.' read -ra VERSION <<< "v1.0.0.0"#v
+          IFS='.' read -ra VERSION <<< "${NEW_TAG#v}"
 
           # バージョンを数値として取得
           MAJOR="${VERSION[0]}"
