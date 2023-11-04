@@ -30,7 +30,7 @@ jobs:
             NEW_TAG="v1.0.0.0"
             echo "Initial release: $NEW_TAG"
             echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-            exit 1
+            exit 0
           fi
 
           # タグからバージョン部分を取得して分割
