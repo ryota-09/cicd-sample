@@ -10,52 +10,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Generate new tag
-      id: new_tag
-      run: |
-        # 最新のタグを取得
-        LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
+      - name: Generate new tag
+        id: new_tag
+        run: |
+          # 最新のタグを取得
+          LATEST_TAG=$(git describe --tags $(git rev-list --tags --max-count=1) 2>/dev/null)
 
-        # タグが存在しない場合、初期リリースとしてv1.0.0.0をセット
-        if [[ -z "$LATEST_TAG" ]]; then
-          NEW_TAG="v1.0.0.0"
-          echo "Initial release: $NEW_TAG"
-          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
-          exit 0
-        fi
+          # タグが存在しない場合、初期リリースとしてv1.0.0.0をセット
+          if [[ -z "$LATEST_TAG" ]]; then
+            NEW_TAG="v1.0.0.0"
+            echo "Initial release: $NEW_TAG"
+            echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+            exit 0
+          fi
 
-        echo "Latest tag: $LATEST_TAG"
+          echo "Latest tag: $LATEST_TAG"
 
-        # タグからバージョン部分を取得して分割
-        IFS='.' read -ra VERSION <<< "${LATEST_TAG#v}"
+          # タグからバージョン部分を取得して分割
+          IFS='.' read -ra VERSION <<< "${LATEST_TAG#v}"
 
-        # バージョンを数値として取得
-        MAJOR="${VERSION[0]}"
-        MINOR="${VERSION[1]}"
-        PATCH1="${VERSION[2]}"
-        PATCH2="${VERSION[3]}"
+          # バージョンを数値として取得
+          MAJOR="${VERSION[0]}"
+          MINOR="${VERSION[1]}"
+          PATCH1="${VERSION[2]}"
+          PATCH2="${VERSION[3]}"
 
-        # パッチバージョンをインクリメント
-        PATCH2=$((PATCH2 + 1))
+          # パッチバージョンをインクリメント
+          PATCH2=$((PATCH2 + 1))
 
-        # 繰り上がりの処理
-        if (( PATCH2 > 9 )); then
-          PATCH2=0
-          PATCH1=$((PATCH1 + 1))
-          if (( PATCH1 > 9 )); then
-            PATCH1=0
-            MINOR=$((MINOR + 1))
-            if (( MINOR > 9 )); then
-              MINOR=0
-              MAJOR=$((MAJOR + 1))
+          # 繰り上がりの処理
+          if (( PATCH2 > 9 )); then
+            PATCH2=0
+            PATCH1=$((PATCH1 + 1))
+            if (( PATCH1 > 9 )); then
+              PATCH1=0
+              MINOR=$((MINOR + 1))
+              if (( MINOR > 9 )); then
+                MINOR=0
+                MAJOR=$((MAJOR + 1))
+              fi
             fi
           fi
-        fi
 
-        # 新しいタグを生成
-        NEW_TAG="v$MAJOR.$MINOR.$PATCH1.$PATCH2"
-        echo "New tag: $NEW_TAG"
-        echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+          # 新しいタグを生成
+          NEW_TAG="v$MAJOR.$MINOR.$PATCH1.$PATCH2"
+          echo "New tag: $NEW_TAG"
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
