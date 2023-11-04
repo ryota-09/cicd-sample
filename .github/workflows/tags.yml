@@ -62,3 +62,12 @@ jobs:
           NEW_TAG="v$MAJOR.$MINOR.$PATCH1.$PATCH2"
           echo "New tag: $NEW_TAG"
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+      - name: リリースタグをgitにpush
+        id: set_git_tag
+        run: |
+          echo "${{ steps.set_release_tag.outputs.new_tag }}" 
+          # cat TARGET_TAG_NAME
+          # git tag $(cat TARGET_TAG_NAME)
+          # git push origin $(cat TARGET_TAG_NAME)
+          # echo ::set-output name=target_tag_name::$(cat TARGET_TAG_NAME)
