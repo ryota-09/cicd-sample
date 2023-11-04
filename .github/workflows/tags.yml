@@ -63,7 +63,7 @@ jobs:
           echo "New tag: $NEW_TAG"
           echo ::set-output name=new_tag::$NEW_TAG
 
-      - name: 権限を付与
+      - name: 権限を付与とタグの設定
         run: |
           echo "${{ secrets.FOR_TAG_GITHUB_TOKEN }}"
           git config user.name "GitHub Actions"
