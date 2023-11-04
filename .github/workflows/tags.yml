@@ -57,25 +57,20 @@ jobs:
               fi
             fi
           fi
+          
           # 新しいタグを生成
           NEW_TAG="v$MAJOR.$MINOR.$PATCH1.$PATCH2"
           echo "New tag: $NEW_TAG"
           echo ::set-output name=new_tag::$NEW_TAG
 
-      # - name: Set Git Committer Info
-      #   run: |
-      #     git config user.name "GitHub Actions"
-      #     git config user.email "actions@github.com"
-
-      - name: 権限を付与とタグの設定
+      - name: リリースノートのコンテンツの作成
         id: set_body
         run: |
-          TARGET_TAG_NAME="${{ steps.set_release_tag.outputs.new_tag }}"
           CURRENT_DATE=$(TZ="Asia/Tokyo" date +"%Y年%m月%d日")
           BODY="${CURRENT_DATE}公開"
           echo ::set-output name=body::$BODY
 
-      - name: Create a GitHub release
+      - name: タグの設定
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.set_release_tag.outputs.new_tag }}
