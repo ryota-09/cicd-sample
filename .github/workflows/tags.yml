@@ -32,3 +32,5 @@ jobs:
             echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
             exit 0
           fi
+
+          echo "コール"
