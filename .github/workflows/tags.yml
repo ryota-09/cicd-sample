@@ -67,7 +67,7 @@ jobs:
       - name: リリースノートのコンテンツの作成
         id: set_body
         run: |
-          CURRENT_DATE=$(TZ="Asia/Tokyo" date +"%Y年%m月%d日%h:%m")
+          CURRENT_DATE=$(TZ="Asia/Tokyo" date +"%Y年%m月%d日%H:%M")
           BODY="${CURRENT_DATE} 公開"
           echo ::set-output name=body::$BODY
 
