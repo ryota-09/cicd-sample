@@ -19,6 +19,7 @@ jobs:
         run: |
           git fetch --prune --unshallow
           echo "$(git tag --sort=creatordate | tail -n 1)" > CUR_TAG
+          # name=cur_tag::$CUR_TAG では値を設定できない。
           echo ::set-output name=cur_tag::$(cat CUR_TAG)
 
       - name: リリースタグを設定
@@ -66,8 +67,8 @@ jobs:
       - name: リリースノートのコンテンツの作成
         id: set_body
         run: |
-          CURRENT_DATE=$(TZ="Asia/Tokyo" date +"%Y年%m月%d日")
-          BODY="${CURRENT_DATE}公開"
+          CURRENT_DATE=$(TZ="Asia/Tokyo" date +"%Y年%m月%d日%h:%m")
+          BODY="${CURRENT_DATE} 公開"
           echo ::set-output name=body::$BODY
 
       - name: リリースノートを含めたタグの設定
